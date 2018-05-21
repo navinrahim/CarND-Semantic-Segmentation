@@ -8,7 +8,7 @@ The following are the final hyperparameters:
    Learning Rate: 0.0001
    Batch Size: 8
    
-The final loss came around 0.05. The following are some of the output images:
+The final loss came around 0.46. The following are some of the output images:
 ![Out1](output_images/out1.png)
 ![Out2](output_images/out2.png)
 ![Out3](output_images/out3.png)
