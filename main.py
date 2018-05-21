@@ -4,6 +4,7 @@ import helper
 import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
+import shutil
 
 # Check TensorFlow Version
 assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
@@ -107,8 +108,10 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     labels = tf.reshape(correct_label, (-1, num_classes))
     # Loss calculation
-    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels))    
-
+    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels))  
+    reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
+    reg_constant = 0.01
+    cross_entropy_loss = cross_entropy_loss + reg_constant * sum(reg_losses)
     #Gradient Descent
     optimizer = tf.train.AdamOptimizer(learning_rate)
     train_op = optimizer.minimize(cross_entropy_loss)
@@ -137,14 +140,14 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 
     for epoch in range(epochs):
         print('*****************************')
-        print('Epoch ',epoch,':')
+        print('Epoch ',epoch+1,':')
         print('----------------')
         for X_batch , y_batch in get_batches_fn(batch_size):
             loss, _ = sess.run([cross_entropy_loss, train_op], feed_dict={
                 input_image: X_batch,
                 correct_label: y_batch,
                 keep_prob: 0.5,
-                learning_rate: 0.001
+                learning_rate: 0.0001
             })
         print('Loss :', loss)
     
@@ -160,9 +163,9 @@ def run():
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
     correct_label = tf.placeholder(tf.float32, (None, None, None, num_classes))
-    epochs = 10
+    epochs = 22
     batch_size = 8
-    keep_prob = 0.5
+    keep_prob = tf.placeholder(tf.float32)
     learning_rate = tf.placeholder(tf.float32)
 
     # Download pretrained vgg model
@@ -194,7 +197,7 @@ def run():
 
         # TODO: Save inference data using helper.save_inference_samples
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, 1., image_input)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
 
         #Saving Model
         if "saved_model" in os.listdir(os.getcwd()):
