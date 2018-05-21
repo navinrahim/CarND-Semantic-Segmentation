@@ -1,6 +1,19 @@
 # Semantic Segmentation
 ### Introduction
-In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
+In this project, every pixel of a road in images are labelled using a Fully Convolutional Network (FCN).
+
+### Reflection
+The following are the final hyperparameters:
+   Epochs: 20
+   Learning Rate: 0.0001
+   Batch Size: 8
+   
+The final loss came around 0.05. The following are some of the output images:
+![Out1](output_images/out1.png)
+![Out2](output_images/out2.png)
+![Out3](output_images/out3.png)
+![Out4](output_images/out4.png)
+![Out5](output_images/out5.png)
 
 ### Setup
 ##### GPU
